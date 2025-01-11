@@ -1,4 +1,3 @@
-
 import './App.css';
 import React, { useState } from 'react';
 
@@ -7,13 +6,36 @@ function App() {
   const [items, setItems] = useState([]);
   // State to manage the input field value
   const [inputValue, setInputValue] = useState('');
+  // State to manage the item being edited
+  const [editIndex, setEditIndex] = useState(null);
 
   // Function to handle adding a new item to the list
   const handleAddItem = () => {
     if (inputValue.trim() !== '') {
-      setItems([...items, inputValue]);
+      if (editIndex !== null) {
+        // If editing an existing item
+        const updatedItems = [...items];
+        updatedItems[editIndex] = inputValue;
+        setItems(updatedItems);
+        setEditIndex(null); // Reset edit mode
+      } else {
+        // If adding a new item
+        setItems([...items, inputValue]);
+      }
       setInputValue(''); // Clear the input field
     }
+  };
+
+  // Function to handle deleting an item
+  const handleDeleteItem = (index) => {
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems);
+  };
+
+  // Function to handle editing an item
+  const handleEditItem = (index) => {
+    setInputValue(items[index]); // Set input field to the item being edited
+    setEditIndex(index); // Set the index of the item being edited
   };
 
   return (
@@ -32,16 +54,30 @@ function App() {
             onClick={handleAddItem}
             className="px-6 py-2 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            Add Item
+            {editIndex !== null ? 'Update Item' : 'Add Item'}
           </button>
         </div>
         <ul className="w-80">
           {items.map((item, index) => (
             <li
               key={index}
-              className="px-4 py-2 bg-gray-700 rounded-lg mb-2 text-lg"
+              className="px-4 py-2 bg-gray-700 rounded-lg mb-2 text-lg flex justify-between items-center"
             >
               {item}
+              <div>
+                <button
+                  onClick={() => handleEditItem(index)}
+                  className="px-3 py-1 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-yellow-500 mr-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteItem(index)}
+                  className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  Delete
+                </button>
+              </div>
             </li>
           ))}
         </ul>
